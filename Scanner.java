@@ -127,11 +127,24 @@ public class Scanner {
         return c >= '0' && c <= '9';
     }
 
-    // Reconoce un número entero
+    // Reconoce un número (entero o decimal)
     private void number() {
+        // Consumir dígitos de la parte entera
         while (!isAtEnd() && isDigit(peek())) {
             advance();
         }
+        
+        // Buscar punto decimal
+        if (!isAtEnd() && peek() == '.' && isDigit(peekNext())) {
+            // Consumir el punto
+            advance();
+            
+            // Consumir dígitos de la parte decimal
+            while (!isAtEnd() && isDigit(peek())) {
+                advance();
+            }
+        }
+        
         String num = source.substring(start, current);
         tokens.add(new Token(TipoToken.NUMBER, num));
     }
@@ -187,5 +200,12 @@ public class Scanner {
         if (isAtEnd())
             return '\0';
         return source.charAt(current);
+    }
+    
+    // Mira el siguiente caracter sin consumirlo
+    private char peekNext() {
+        if (current + 1 >= source.length())
+            return '\0';
+        return source.charAt(current + 1);
     }
 }
