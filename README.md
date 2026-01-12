@@ -58,7 +58,7 @@ La siguiente tarea es implementar el **Parser predictivo** basado en la gramáti
 
 ```bash
 # Compilar (desde la carpeta con los .java)
-javac Interprete.java Scanner.java Token.java TipoToken.java
+javac Interprete.java Scanner.java Token.java TipoToken.java Expresion.java
 
 # Ejecutar REPL
 java Interprete
