@@ -1,11 +1,9 @@
 import java.util.List;
 
-// Clase base abstracta para todas las expresiones
 abstract class Expresion {
     abstract <R> R aceptar(Visitor<R> visitor);
 }
 
-// Interfaz Visitor para el patrón visitante
 interface Visitor<R> {
     R visitarExpresionLiteral(Literal expr);
     R visitarExpresionUnaria(Unaria expr);
@@ -16,7 +14,6 @@ interface Visitor<R> {
     R visitarExpresionLlamada(Llamada expr);
 }
 
-// Expresión literal (números, strings, null)
 class Literal extends Expresion {
     final Object valor;
 
@@ -30,7 +27,6 @@ class Literal extends Expresion {
     }
 }
 
-// Expresión unaria (-expr)
 class Unaria extends Expresion {
     final Token operador;
     final Expresion derecha;
@@ -46,7 +42,6 @@ class Unaria extends Expresion {
     }
 }
 
-// Expresión binaria (izq op der)
 class Binaria extends Expresion {
     final Expresion izquierda;
     final Token operador;
@@ -64,7 +59,6 @@ class Binaria extends Expresion {
     }
 }
 
-// Expresión de agrupación (expr)
 class Agrupacion extends Expresion {
     final Expresion expresion;
 
@@ -78,7 +72,6 @@ class Agrupacion extends Expresion {
     }
 }
 
-// Expresión de variable (identificador)
 class Variable extends Expresion {
     final Token nombre;
 
@@ -92,7 +85,6 @@ class Variable extends Expresion {
     }
 }
 
-// Expresión de asignación (nombre = valor)
 class Asignacion extends Expresion {
     final Token nombre;
     final Expresion valor;
@@ -108,7 +100,6 @@ class Asignacion extends Expresion {
     }
 }
 
-// Expresión de llamada a función (nombre(args))
 class Llamada extends Expresion {
     final Expresion llamado;
     final Token parentesis;

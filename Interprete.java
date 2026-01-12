@@ -13,7 +13,7 @@ public class Interprete {
         BufferedReader reader = new BufferedReader(input);
 
         System.out.println("Interprete iniciado. Escribe 'salir' para terminar.");
-        
+
         for (;;) {
             System.out.print(">>> ");
             String linea = reader.readLine();
@@ -26,19 +26,15 @@ public class Interprete {
 
     private static void ejecutar(String source) {
         try {
-            // Verificar si la línea termina con punto y coma
             boolean tienePuntoComa = source.trim().endsWith(";");
 
-            // 1. Escáner
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.scan();
 
             if (tokens == null) {
-                // Error léxico, no continuamos
                 return;
             }
 
-            // 2. Parser (ahora genera AST)
             Parser parser = new Parser(tokens);
             Expresion expresion = parser.parse();
 
@@ -47,10 +43,8 @@ public class Interprete {
                 return;
             }
 
-            // 3. Intérprete (ejecuta el AST)
             Object resultado = interpreter.interpretar(expresion);
 
-            // 4. Imprimir resultado solo si no hay ";"
             if (resultado != null && !tienePuntoComa) {
                 System.out.println(stringify(resultado));
             }
@@ -60,7 +54,6 @@ public class Interprete {
         }
     }
 
-    // Convierte un objeto a String para imprimir
     private static String stringify(Object objeto) {
         if (objeto == null) return "null";
         if (objeto instanceof Double) {
@@ -73,16 +66,13 @@ public class Interprete {
         return objeto.toString();
     }
 
-    // ---------------------------------------------------------------------
-    // Método de error accesible para otras clases
-    // ---------------------------------------------------------------------
     static void error(int linea, String mensaje) {
         reportar(linea, "", mensaje);
     }
 
     private static void reportar(int linea, String posicion, String mensaje) {
         System.err.println(
-            "[linea " + linea + "] Error " + posicion + ": " + mensaje
+                "[linea " + linea + "] Error " + posicion + ": " + mensaje
         );
         existenErrores = true;
     }

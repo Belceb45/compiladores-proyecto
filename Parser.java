@@ -11,9 +11,6 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    // ---------------------------------------------------------
-    //  MÉTODO PÚBLICO - Ahora retorna Expresion
-    // ---------------------------------------------------------
     public Expresion parse() {
         try {
             return statement();
@@ -22,40 +19,30 @@ public class Parser {
         }
     }
 
-    // ---------------------------------------------------------
-    //  GRAMÁTICA - Ahora retornan Expresion
-    // ---------------------------------------------------------
-
-    // STATEMENT → EXPRESSION (";" | ε)
     private Expresion statement() {
         Expresion expr = expression();
 
-        // punto y coma opcional
         if (match(TipoToken.SEMICOLON)) {
-            // nada
         }
         return expr;
     }
 
-    // EXPRESSION → ASSIGNMENT
     private Expresion expression() {
         return assignment();
     }
 
-    // ASSIGNMENT → TERM ("=" ASSIGNMENT | ε)
     private Expresion assignment() {
         Expresion expr = term();
 
         if (match(TipoToken.EQUAL)) {
             Token igual = previous();
-            Expresion valor = assignment(); // asociatividad derecha
-            
-            // Verificar que el lado izquierdo sea una variable
+            Expresion valor = assignment();
+
             if (expr instanceof Variable) {
                 Token nombre = ((Variable) expr).nombre;
                 return new Asignacion(nombre, valor);
             }
-            
+
             error(igual, "Lado izquierdo de asignación inválido.");
             throw new ParseError();
         }
@@ -63,7 +50,6 @@ public class Parser {
         return expr;
     }
 
-    // TERM → FACTOR { ("+" | "-") FACTOR }
     private Expresion term() {
         Expresion expr = factor();
 
@@ -76,7 +62,6 @@ public class Parser {
         return expr;
     }
 
-    // FACTOR → UNARY { ("*" | "/" | "%") UNARY }
     private Expresion factor() {
         Expresion expr = unary();
 
@@ -89,7 +74,6 @@ public class Parser {
         return expr;
     }
 
-    // UNARY → ("-" UNARY) | CALL
     private Expresion unary() {
         if (match(TipoToken.MINUS)) {
             Token operador = previous();
@@ -99,7 +83,6 @@ public class Parser {
         return call();
     }
 
-    // CALL → PRIMARY ("(" ARGUMENTS ")")?
     private Expresion call() {
         Expresion expr = primary();
 
@@ -113,24 +96,22 @@ public class Parser {
         return expr;
     }
 
-    // PRIMARY → number | string | null | id | "(" EXPRESSION ")"
     private Expresion primary() {
         if (match(TipoToken.NUMBER)) {
             String lexema = previous().lexema;
             return new Literal(Double.parseDouble(lexema));
         }
-        
+
         if (match(TipoToken.STRING)) {
             String lexema = previous().lexema;
-            // Remover las comillas de la cadena
             String valor = lexema.substring(1, lexema.length() - 1);
             return new Literal(valor);
         }
-        
+
         if (match(TipoToken.NULL)) {
             return new Literal(null);
         }
-        
+
         if (match(TipoToken.IDENTIFIER)) {
             return new Variable(previous());
         }
@@ -145,23 +126,18 @@ public class Parser {
         throw new ParseError();
     }
 
-    // ARGUMENTS → EXPRESSION { "," EXPRESSION } | ε
     private List<Expresion> arguments() {
         List<Expresion> argumentos = new ArrayList<>();
-        
+
         if (!check(TipoToken.RIGHT_PAREN)) {
             argumentos.add(expression());
             while (match(TipoToken.COMMA)) {
                 argumentos.add(expression());
             }
         }
-        
+
         return argumentos;
     }
-
-    // ---------------------------------------------------------
-    //  UTILIDADES DEL PARSER
-    // ---------------------------------------------------------
 
     private boolean match(TipoToken... tipos) {
         for (TipoToken t : tipos) {
@@ -201,10 +177,6 @@ public class Parser {
     private Token previous() {
         return tokens.get(current - 1);
     }
-
-    // ---------------------------------------------------------
-    //  MANEJO DE ERRORES
-    // ---------------------------------------------------------
 
     private void error(Token token, String mensaje) {
         System.err.println("[Error] en '" + token.lexema + "': " + mensaje);

@@ -4,14 +4,14 @@ import java.util.Map;
 
 public class Interpreter implements Visitor<Object> {
 
-    // Tabla de símbolos para variables
+
     private final Map<String, Object> variables = new HashMap<>();
     
-    // Tabla de funciones predefinidas
+
     private final Map<String, FuncionPredefinida> funciones = new HashMap<>();
 
     public Interpreter() {
-        // Registrar funciones predefinidas
+
         funciones.put("rand", new FuncionPredefinida(0) {
             @Override
             public Object llamar(List<Object> argumentos) {
@@ -53,7 +53,6 @@ public class Interpreter implements Visitor<Object> {
         });
     }
 
-    // Método principal para interpretar una expresión
     public Object interpretar(Expresion expresion) {
         try {
             return evaluar(expresion);
@@ -66,10 +65,6 @@ public class Interpreter implements Visitor<Object> {
     private Object evaluar(Expresion expr) {
         return expr.aceptar(this);
     }
-
-    // ---------------------------------------------------------
-    // Implementación del Visitor
-    // ---------------------------------------------------------
 
     public Object visitarExpresionLiteral(Literal expr) {
         return expr.valor;
@@ -96,7 +91,7 @@ public class Interpreter implements Visitor<Object> {
                 verificarNumeros(izquierda, derecha, "-");
                 return (Double) izquierda - (Double) derecha;
             case PLUS:
-                // Permite suma de números o concatenación de strings
+
                 if (izquierda instanceof Double && derecha instanceof Double) {
                     return (Double) izquierda + (Double) derecha;
                 }
@@ -143,7 +138,6 @@ public class Interpreter implements Visitor<Object> {
     }
 
     public Object visitarExpresionLlamada(Llamada expr) {
-        // El llamado debe ser una variable (nombre de función)
         if (!(expr.llamado instanceof Variable)) {
             throw new RuntimeError("Solo se puede llamar a funciones, no a '" + 
                                  stringify(evaluar(expr.llamado)) + "'.");
@@ -151,34 +145,25 @@ public class Interpreter implements Visitor<Object> {
 
         String nombreFuncion = ((Variable) expr.llamado).nombre.lexema;
 
-        // Verificar que la función existe
         if (!funciones.containsKey(nombreFuncion)) {
             throw new RuntimeError("Función no definida: '" + nombreFuncion + "'.");
         }
 
         FuncionPredefinida funcion = funciones.get(nombreFuncion);
 
-        // Evaluar argumentos
         List<Expresion> argumentosExpr = expr.argumentos;
         java.util.ArrayList<Object> argumentos = new java.util.ArrayList<>();
         for (Expresion argExpr : argumentosExpr) {
             argumentos.add(evaluar(argExpr));
         }
 
-        // Verificar número de argumentos
         if (argumentos.size() != funcion.aridad) {
             throw new RuntimeError("La función '" + nombreFuncion + 
                                  "' espera " + funcion.aridad + 
                                  " argumento(s), pero se recibieron " + argumentos.size() + ".");
         }
-
-        // Llamar a la función
         return funcion.llamar(argumentos);
     }
-
-    // ---------------------------------------------------------
-    // Métodos auxiliares
-    // ---------------------------------------------------------
 
     private void verificarNumero(Object operando, String operador) {
         if (operando instanceof Double) return;
@@ -202,11 +187,6 @@ public class Interpreter implements Visitor<Object> {
         return objeto.toString();
     }
 
-    // ---------------------------------------------------------
-    // Clases auxiliares
-    // ---------------------------------------------------------
-
-    // Clase base para funciones predefinidas
     private abstract static class FuncionPredefinida {
         final int aridad;
 
@@ -217,7 +197,6 @@ public class Interpreter implements Visitor<Object> {
         abstract Object llamar(List<Object> argumentos);
     }
 
-    // Excepción para errores de ejecución
     private static class RuntimeError extends RuntimeException {
         RuntimeError(String mensaje) {
             super(mensaje);
